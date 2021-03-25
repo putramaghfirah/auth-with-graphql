@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
 import { Auth } from './Auth';
 import { Register } from './Register';
+import { MyProfile } from './MyProfile';
 import { NotFound } from './NotFound';
 import { GlobalStyle } from '../style/GlobalStyle';
 
@@ -14,6 +15,7 @@ export function App() {
         <Switch>
           <Route exact path="/" component={Auth} />
           <Route exact path="/register" component={Register} />
+          <Route exact path="/myprofile" component={MyProfile} />
           <Route path="*" component={NotFound} />
         </Switch>
       </BrowserRouter>

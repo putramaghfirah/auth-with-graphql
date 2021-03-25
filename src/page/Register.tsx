@@ -40,6 +40,7 @@ export function Register() {
         }, 2000);
       })
       .catch((error) => {
+        Alert.error('Register Failed.', 1000);
         console.log(error);
       });
   }
