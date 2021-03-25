@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '../components/Card';
 import styled from 'styled-components';
 import { gql, useMutation } from '@apollo/client';
 import { Form, FormGroup, Button, FormControl, ButtonToolbar } from 'rsuite';
+import { Redirect } from 'react-router-dom';
+import { Alert } from 'rsuite';
 
 const POST_USER = gql`
   mutation CreateUser(
@@ -20,7 +22,7 @@ const POST_USER = gql`
 `;
 export function Register() {
   const [createUser] = useMutation(POST_USER);
-
+  const [redirect, setRedirect] = useState<string>('');
   // const onSubmit = (_status: boolean, value: any) => console.log(value);
   function onSubmit(_status: boolean, event: any) {
     createUser({
@@ -31,11 +33,19 @@ export function Register() {
       },
     })
       .then((data) => {
-        console.log(data);
+        // console.log(data);
+        Alert.success('Register Success.', 1000);
+        setTimeout(() => {
+          setRedirect('/');
+        }, 2000);
       })
       .catch((error) => {
         console.log(error);
       });
+  }
+
+  if (redirect) {
+    return <Redirect to={redirect} />;
   }
   return (
     <React.Fragment>
