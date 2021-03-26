@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
 import { Card } from '../components/Card';
 import styled from 'styled-components';
-import { gql, useMutation } from '@apollo/client';
-import { Form, FormGroup, Button, FormControl, ButtonToolbar } from 'rsuite';
+import { ApolloError, gql, useMutation } from '@apollo/client';
+import {
+  Schema,
+  Form,
+  FormGroup,
+  Button,
+  FormControl,
+  ButtonToolbar,
+} from 'rsuite';
 import { Redirect } from 'react-router-dom';
-import { Alert } from 'rsuite';
+import { Alert, Message } from 'rsuite';
 
 const POST_USER = gql`
   mutation CreateUser(
@@ -20,10 +27,29 @@ const POST_USER = gql`
     }
   }
 `;
+
+const { StringType } = Schema.Types;
+const model = Schema.Model({
+  name: StringType().isRequired('This field is required.'),
+  email: StringType()
+    .isEmail('Please enter a valid email address.')
+    .isRequired('This field is required.'),
+  password: StringType().isRequired('This field is required.'),
+});
+
+function TextField(props: any) {
+  const { name, accepter, ...rest } = props;
+  return (
+    <FormGroup>
+      <FormControl name={name} accepter={accepter} {...rest} />
+    </FormGroup>
+  );
+}
+
 export function Register() {
-  const [createUser] = useMutation(POST_USER);
+  const [createUser, { error }] = useMutation(POST_USER);
   const [redirect, setRedirect] = useState<string>('');
-  // const onSubmit = (_status: boolean, value: any) => console.log(value);
+
   function onSubmit(_status: boolean, event: any) {
     createUser({
       variables: {
@@ -32,40 +58,52 @@ export function Register() {
         full_name: event.target[0].value,
       },
     })
-      .then((data) => {
-        // console.log(data);
+      .then((_data) => {
         Alert.success('Register Success.', 1000);
         setTimeout(() => {
           setRedirect('/');
         }, 2000);
       })
-      .catch((error) => {
-        Alert.error('Register Failed.', 1000);
-        console.log(error);
+      .catch((err) => {
+        console.log(err.message);
       });
   }
 
   if (redirect) {
     return <Redirect to={redirect} />;
   }
+
+  function getErrorMessage(code: number) {
+    switch (code) {
+      case 11000:
+        return 'Email telah digunakan';
+      default:
+        return 'error';
+    }
+  }
+
+  function getErrorMessages(error: ApolloError): string[] {
+    const errors: string[] = error.graphQLErrors.map((gqlErr) => {
+      return getErrorMessage(gqlErr.extensions?.exception.code);
+    });
+    return errors;
+  }
   return (
     <React.Fragment>
       <Title>Register</Title>
       <Card width="300px">
-        <Form onSubmit={onSubmit} fluid>
-          <FormGroup>
-            <FormControl placeholder="Full Name" name="name" />
-          </FormGroup>
-          <FormGroup>
-            <FormControl placeholder="Email" name="email" type="email" />
-          </FormGroup>
-          <FormGroup>
-            <FormControl
-              placeholder="Password"
-              name="password"
-              type="password"
+        <Form onSubmit={onSubmit} model={model} fluid>
+          {error && (
+            <Message
+              style={{ marginBottom: 20 }}
+              showIcon
+              type="error"
+              description={getErrorMessages(error)}
             />
-          </FormGroup>
+          )}
+          <TextField name="name" placeholder="Full Name" />
+          <TextField name="email" placeholder="Email" type="email" />
+          <TextField name="password" placeholder="Password" type="password" />
           <FormGroup>
             <ButtonToolbar>
               <Button type="submit" appearance="primary">
