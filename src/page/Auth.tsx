@@ -1,24 +1,31 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link, Redirect } from 'react-router-dom';
-import { Form, FormGroup, Button, FormControl, ButtonToolbar } from 'rsuite';
 import { gql, useLazyQuery } from '@apollo/client';
+import { useForm } from 'react-hook-form';
+import { Message, Button } from 'rsuite';
 
 import { Card } from '../components/Card';
+import { Input, InputField, getValidationMessages } from '../components/Input';
 
+import { Inputs } from './Types/Input';
+
+// getuser with query graphql
 const LOGIN = gql`
   query Login($email: String!, $password: String!) {
     login(email: $email, password: $password)
   }
 `;
-export function Auth() {
-  const [login, { data }] = useLazyQuery(LOGIN);
 
-  function onSubmit(_status: boolean, value: any) {
+export function Auth() {
+  const [login, { data, error }] = useLazyQuery(LOGIN);
+  const { register, handleSubmit, errors } = useForm<Inputs>({});
+
+  function onSubmit(data: Inputs) {
     login({
       variables: {
-        email: value.target[0].value,
-        password: value.target[1].value,
+        email: data.email,
+        password: data.password,
       },
     });
   }
@@ -30,24 +37,31 @@ export function Auth() {
     <React.Fragment>
       <Title>Login</Title>
       <Card width="300px">
-        <Form fluid onSubmit={onSubmit}>
-          <FormGroup>
-            <FormControl placeholder="Email" name="email" type="email" />
-          </FormGroup>
-          <FormGroup>
-            <FormControl
-              placeholder="Password"
-              name="password"
-              type="password"
+        <Form onSubmit={handleSubmit(onSubmit)}>
+          {error && (
+            <Message
+              style={{ marginBottom: 20 }}
+              showIcon
+              type="error"
+              description="Login gagal"
             />
-          </FormGroup>
-          <FormGroup>
-            <ButtonToolbar>
-              <Button type="submit" appearance="primary">
-                Login
-              </Button>
-            </ButtonToolbar>
-          </FormGroup>
+          )}
+          {getValidationMessages(errors)}
+          <Input
+            name="email"
+            ref={register({ required: true })}
+            type="email"
+            placeholder="Email"
+          />
+          <Input
+            name="password"
+            ref={register({ required: true })}
+            type="password"
+            placeholder="Password"
+          />
+          <Button type="submit" appearance="primary">
+            Login
+          </Button>
         </Form>
         <Register>
           No account ? <Link to="/register">Create One</Link>
@@ -65,4 +79,22 @@ const Title = styled.p`
 
 const Register = styled.p`
   margin-top: 20px;
+`;
+
+const Form = styled.form`
+  ${InputField} {
+    margin: auto;
+    margin-bottom: 15px;
+    transition: 0.3s ease-in-out;
+  }
+
+  ${InputField}:hover {
+    border: 1px solid rgb(33, 123, 225);
+  }
+
+  ${InputField}:focus {
+    border: 1px solid rgb(33, 123, 225);
+    border-radius: 6px;
+    outline: none;
+  }
 `;

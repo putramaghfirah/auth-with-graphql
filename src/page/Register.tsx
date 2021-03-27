@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
-import { Card } from '../components/Card';
 import styled from 'styled-components';
-import { ApolloError, gql, useMutation } from '@apollo/client';
-import {
-  Schema,
-  Form,
-  FormGroup,
-  Button,
-  FormControl,
-  ButtonToolbar,
-} from 'rsuite';
 import { Redirect } from 'react-router-dom';
-import { Alert, Message } from 'rsuite';
+import { ApolloError, gql, useMutation } from '@apollo/client';
+import { useForm } from 'react-hook-form';
+import { Button, Message, Alert } from 'rsuite';
 
+import { Card } from '../components/Card';
+import { Input, InputField, getValidationMessages } from '../components/Input';
+
+import { Inputs } from './Types/Input';
+
+// post user with mutation
 const POST_USER = gql`
   mutation CreateUser(
     $email: String!
@@ -28,34 +26,17 @@ const POST_USER = gql`
   }
 `;
 
-const { StringType } = Schema.Types;
-const model = Schema.Model({
-  name: StringType().isRequired('This field is required.'),
-  email: StringType()
-    .isEmail('Please enter a valid email address.')
-    .isRequired('This field is required.'),
-  password: StringType().isRequired('This field is required.'),
-});
-
-function TextField(props: any) {
-  const { name, accepter, ...rest } = props;
-  return (
-    <FormGroup>
-      <FormControl name={name} accepter={accepter} {...rest} />
-    </FormGroup>
-  );
-}
-
 export function Register() {
   const [createUser, { error }] = useMutation(POST_USER);
   const [redirect, setRedirect] = useState<string>('');
+  const { register, handleSubmit, errors } = useForm<Inputs>({});
 
-  function onSubmit(_status: boolean, event: any) {
+  function onSubmit(data: Inputs) {
     createUser({
       variables: {
-        email: event.target[1].value,
-        password: event.target[2].value,
-        full_name: event.target[0].value,
+        email: data.email,
+        password: data.password,
+        full_name: data.fullname,
       },
     })
       .then((_data) => {
@@ -88,11 +69,12 @@ export function Register() {
     });
     return errors;
   }
+
   return (
     <React.Fragment>
       <Title>Register</Title>
       <Card width="300px">
-        <Form onSubmit={onSubmit} model={model} fluid>
+        <Form onSubmit={handleSubmit(onSubmit)}>
           {error && (
             <Message
               style={{ marginBottom: 20 }}
@@ -101,16 +83,31 @@ export function Register() {
               description={getErrorMessages(error)}
             />
           )}
-          <TextField name="name" placeholder="Full Name" />
-          <TextField name="email" placeholder="Email" type="email" />
-          <TextField name="password" placeholder="Password" type="password" />
-          <FormGroup>
-            <ButtonToolbar>
-              <Button type="submit" appearance="primary">
-                Register
-              </Button>
-            </ButtonToolbar>
-          </FormGroup>
+          {getValidationMessages(errors)}
+          <Input
+            name="fullname"
+            ref={register({ required: true })}
+            placeholder="Full Name"
+          />
+          <Input
+            name="email"
+            ref={register({ required: true })}
+            type="email"
+            placeholder="Email"
+          />
+          <Input
+            name="password"
+            ref={register({ required: true })}
+            type="password"
+            placeholder="Password"
+          />
+          <Button
+            style={{ display: 'block', margin: 'auto' }}
+            type="submit"
+            appearance="primary"
+          >
+            Register
+          </Button>
         </Form>
       </Card>
     </React.Fragment>
@@ -120,4 +117,22 @@ const Title = styled.p`
   font-size: 20px;
   text-align: center;
   margin-top: 20px;
+`;
+
+const Form = styled.form`
+  ${InputField} {
+    margin: auto;
+    margin-bottom: 15px;
+    transition: 0.3s ease-in-out;
+  }
+
+  ${InputField}:hover {
+    border: 1px solid rgb(33, 123, 225);
+  }
+
+  ${InputField}:focus {
+    border: 1px solid rgb(33, 123, 225);
+    border-radius: 6px;
+    outline: none;
+  }
 `;
