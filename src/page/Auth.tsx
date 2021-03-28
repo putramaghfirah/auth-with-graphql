@@ -1,13 +1,17 @@
+// library
 import React from 'react';
 import styled from 'styled-components';
 import { Link, Redirect } from 'react-router-dom';
 import { gql, useLazyQuery } from '@apollo/client';
 import { useForm } from 'react-hook-form';
 import { Message, Button } from 'rsuite';
+import { Helmet } from 'react-helmet';
 
+// components
 import { Card } from '../components/Card';
 import { Input, InputField, getValidationMessages } from '../components/Input';
 
+// types
 import { Inputs } from './Types/Input';
 
 // getuser with query graphql
@@ -35,6 +39,9 @@ export function Auth() {
   }
   return (
     <React.Fragment>
+      <Helmet>
+        <title>Login</title>
+      </Helmet>
       <Title>Login</Title>
       <Card width="300px">
         <Form onSubmit={handleSubmit(onSubmit)}>

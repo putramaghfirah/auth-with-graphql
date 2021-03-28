@@ -9,6 +9,7 @@ import { Card } from '../components/Card';
 import { Input, InputField, getValidationMessages } from '../components/Input';
 
 import { Inputs } from './Types/Input';
+import { Helmet } from 'react-helmet';
 
 // post user with mutation
 const POST_USER = gql`
@@ -72,6 +73,9 @@ export function Register() {
 
   return (
     <React.Fragment>
+      <Helmet>
+        <title>Register</title>
+      </Helmet>
       <Title>Register</Title>
       <Card width="300px">
         <Form onSubmit={handleSubmit(onSubmit)}>
