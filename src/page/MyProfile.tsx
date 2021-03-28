@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { gql, useQuery } from '@apollo/client';
 import { Loader } from 'rsuite';
+import { Helmet } from 'react-helmet';
 
 const GET_PROFILE = gql`
   query GetProfile {
@@ -23,6 +24,9 @@ export function MyProfile() {
   }
   return (
     <React.Fragment>
+      <Helmet>
+        <title>My Profile</title>
+      </Helmet>
       <h1>{data.myProfile.email}</h1>
       <h1>{data.myProfile.user_profile.full_name}</h1>
     </React.Fragment>

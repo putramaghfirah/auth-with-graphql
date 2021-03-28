@@ -11,6 +11,7 @@ import {
   createHttpLink,
 } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
+import { HelmetProvider } from 'react-helmet-async';
 
 import 'rsuite/dist/styles/rsuite-default.css';
 
@@ -39,7 +40,9 @@ ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
       <ThemeProvider theme={theme}>
-        <App />
+        <HelmetProvider>
+          <App />
+        </HelmetProvider>
       </ThemeProvider>
     </ApolloProvider>
   </React.StrictMode>,
