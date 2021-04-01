@@ -15,9 +15,9 @@ export function Card({ width, height, children }: Cards) {
 }
 
 const Container = styled.div<{ width?: string; height?: string }>`
-  padding: 20px;
   width: ${(p) => p.width};
   height: ${(p) => p.height};
+  padding: 20px;
   text-align: center;
   margin: 20px auto;
   border-radius: 10px;

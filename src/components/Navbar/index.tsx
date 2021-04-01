@@ -28,7 +28,7 @@ const Title = styled.p`
   color: ${(p) => p.theme.color.fontColor(0.7)};
   padding: 20px;
   font-size: 21px;
-  font-weight: 700;
+  font-weight: 500;
 `;
 
 const Item = styled.li`
